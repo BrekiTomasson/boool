@@ -15,6 +15,7 @@ class boool {
     private $trueValues = ['string' => 'true', 'bool' => true, 'int' => 1];
     private $maybeValues = ['string' => 'maybe', 'int' => 2];
 
+    private $as = '';
     private $boool = 0;
     private $value = 0;
     private $throwException = 0;
@@ -29,14 +30,10 @@ class boool {
         return $this->boool->value['string'];
     }
 
-    public static function __callStatic($method, array $args)
+    public function asInteger() : boool
     {
-        return self::byName($method);
-    }
-
-    private function makeTrue()
-    {
-        $this->boool->value = $this->trueValues;
+        $this->as = 'int';
+        return $this;
     }
 
 }

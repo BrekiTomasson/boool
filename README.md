@@ -39,8 +39,8 @@ realized that that `function isReady ($task) : oooooooooooooh` just looked silly
 
 ## You still haven't told me what it is.
 
-Oh, right! Sorry about that! Basically, it's an implementation of fuzzy logic. For those not entirely hip to the 
-lingo, the Wikipedia definition reads:
+Oh, right! Sorry about that! Basically, it's an implementation of fuzzy logic. For those not entirely hip to the jive, 
+the Wikipedia definition reads:
 
 > **Fuzzy logic** is a form of many-valued logic in which the truth values of variables may be any real number between
 > 0 and 1. It is employed to handle the concept of partial truth, where the truth value may range between completely
@@ -53,13 +53,86 @@ not have enough information to make an informed decision as to whether something
 yet. The goal is therefore to use the methods provided by the `boool` class/object to understand that more 
 information is required.
 
-## Usage Examples
+A side benefit of this is also that we are able to remove some less obvious boolean responses in PHP, such as how 
+`var_dump((bool) null)` evaluates as `false` while `var_dump((bool) new Exception())` evaluates as `true`, or some of
+ the weird ones, like how the "loose" comparison `var_dump(0 == "")` evaluates as `true` and  
+ 
+ ## Strict and Loose
+ 
+PHP today has two ways of checking if two things are equal, the *strict* and the *loose* method. The easiest way to 
+understand these is that strict comparisons (three equals signs, `===`) always take into account the type of data being 
+entered, while loose comparisons (two equals signs, `==`) do not. It helps to think about loose comparisons as 
+casting both sides of the equals signs to strings before testing. For example, `12 === "12"` would evaluate as false,
+as an integer is by definition never strictly equal to a string. However, `12 == "12"` would evaluate as `true` in 
+loose mode. Even two different kinds of numbers don't strictly equal each other, even when they're the same number. 
+For example, `(int) 12 === (float) 12` would classify as `false`.
+
+> *All that said, I still don't understand why `0 === -0` is true, while `0 === 0.0` is false...*
+
+## But What About `NaN` ? 
+
+I'm glad you asked that, random person reading this in the future. While NaN is used in the project (see further 
+down, under "Casting Responses as Integers)", it is not a central part of it. For a long time, I thought I could 
+write large parts of this code as a wrapper around `NaN` (short for "Not A Number", by the way), but it just didn't 
+work out - at least not in the way I was imagining. Then again, NAN is (as far as I know) the only thing natively in 
+PHP that returns `false` for both `NAN === false` and `NAN === true`, which makes it hugely valuable simply as a
+stand-in for our default value until we can be certain something is either `true` or `false`.
+
+> *Please don't make the mistake of playing too much with NAN. My mind half exploded when I first wrote:*
+>
+> $thisIsTotallyNan = NAN;
+> if ($thisIsTotallyNan === NAN) {
+>   echo 'Told you so.';
+> } 
+>
+> ... and got no output. It got weirder when I tried this:
+>
+> $thisIsTotallyNan = NAN;
+> if ($thisIsTotallyNan !== NAN) {
+>   echo 'How is this even possible!?';
+> } 
+>
+> ... and got the echo...
+
+## Usage: Methods
+
+Note that all of these statements refer to static methods in the `boool` class. You never need to `$boool = new boool
+()` or anything like that. The input is always an array, but a single item or expression (a string, formula or integer, 
+for example) will automatically be cast to array. `Boool::isTrue(5+5 === 10);` would, for example, be functionally 
+equivalent to `Boool::isTrue([5+5 === 10]);` - but `Bool::isTrue(5+5 === 10, 2+2 === 4)` would fail whereas 
+`Bool::isTrue([5+5 === 10, 2+2 === 4])` would not. Note also that a key/value array will only parse the values when 
+performing these methods.
+
+| Command             | Functionality                                                                           |
+| ------------------- | --------------------------------------------------------------------------------------- |
+| `isTrue(<array>)`   | Returns a `boool` indicating if *all* values in the array evaluate as true.               |
+| `hasTrue(<array>)`  | Returns a `boool` indicating if *at least one* value in the array evaluates as true.      |
+| `isFalse(<array>)`  | Returns a `boool` indicating if *all* values in the array evaluate as false.              |
+| `hasFalse(<array>)` | Returns a `boool` indicating if *at least one* value in the array evaluates as false.     |
+| `hasBothTrueAndFalse(<array>)` | returns a `boool` indicating if your array has *at least one true* and *at least one 
+false* value. |
+| `hasNeitherTrueNorFalse(<array>)` | returns a `boool` letting you know whether or not *all* items in the input array 
+are *neither true nor false*. This is *very* unusual. | 
+| `trueOnly(<array>)`   | returns an `array` containing *only* those input values that evaluate as true. (Note; key 
+order is lost in this operation) |
+| `falseOnly(<array>)`  | returns an `array` containing *only* those input values that evaluate as false. (Note; key 
+order is lost in this operation) |
+
+
+## Usage: Examples
 
 
 ### Throw Exception When Neither True Nor False
 
 When constructing the `boool` response, adding `->withException()` to the chain will ensure that you will get a 
-response that is either (by default) a boolean `true`, a boolean `false` or an exception of type `NeitherTrueNorFalse`.
+response that is either (by default) a boolean `true`, a boolean `false` or an exception of type 
+`Boool\Exceptions\NeitherTrueNorFalse`.
+
+### Casting Responses as Integers
+
+If you need to get the results back as an integer, add `->asInteger()` to the chain. This is especially useful if you
+have a series of numbers that you only want to use if some logic about them resolves as true. All you need to do is 
+multiply that number by the integer value of `boool`
 
 ## Syntax
 
