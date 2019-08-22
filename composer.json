@@ -1,0 +1,24 @@
+{
+    "name": "btomasson/boool",
+    "description": "True, False ... and Maybe?",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Breki Tomasson",
+            "email": "breki.tomasson@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "\\Boool\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^7.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.5",
+        "psy/psysh": "^0.9.9"
+    }
+}
