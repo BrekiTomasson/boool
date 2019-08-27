@@ -5,7 +5,6 @@ namespace Boool;
 use Boool\Contracts\Parser;
 use Boool\Traits\ManagesParsers;
 
-
 /**
  * Class Boool
  *
@@ -19,16 +18,16 @@ class Boool {
     private $throwException = false;
     protected $statements = [];
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->loadParsers();
-
     }
 
     public function isTrue($arguments)
     {
         $arguments = $this->wrap($arguments);
+
         $results = $this->validate($arguments);
-        var_dump($results);
     }
 
     /**
