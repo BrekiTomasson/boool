@@ -5,7 +5,9 @@ namespace Boool\Methods;
 use Boool\CommonMethods;
 use Boool\MethodInterface;
 
-class allFalse extends CommonMethods implements MethodInterface {
+class AllTrue extends CommonMethods implements MethodInterface {
+
+    protected array $alias = ['OnlyTrue', 'EverythingTrue'];
 
     /**
      * @param array $array
@@ -14,7 +16,7 @@ class allFalse extends CommonMethods implements MethodInterface {
     public function handle($array = []) : bool
     {
         foreach ($array as $statement) {
-            if ($statement === true) {
+            if ($statement === false) {
                 return false;
             }
         }

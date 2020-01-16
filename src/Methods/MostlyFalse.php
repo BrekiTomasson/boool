@@ -5,7 +5,7 @@ namespace Boool\Methods;
 use Boool\CommonMethods;
 use Boool\MethodInterface;
 
-class mostlyFalse extends CommonMethods implements MethodInterface {
+class MostlyFalse extends CommonMethods implements MethodInterface {
 
     /**
      * @param array $array

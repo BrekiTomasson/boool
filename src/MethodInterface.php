@@ -10,9 +10,4 @@ interface MethodInterface {
      */
     public function handle(array $array = []) : bool;
 
-    /**
-     * @return string
-     */
-    public function getName() : string;
-
 }

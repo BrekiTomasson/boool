@@ -4,11 +4,13 @@ use Boool\Boool;
 
 include './vendor/autoload.php';
 
-$result = Boool::mostlyFalse([
-    1+1===1,
-    1+2===1,
-    1+1===2,
-    9-1===8
-]);
+$boool = Boool::getInstance();
 
-var_dump($result);
+$test1 = $boool->test('onlytrue', [true, true, true, true]);
+$test2 = $boool->test('onlytrue', [true, true, false, true]);
+$test3 = $boool->test('AllTRUE', [false, false, false, false]);
+
+
+var_dump($test1);
+var_dump($test2);
+var_dump($test3);

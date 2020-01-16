@@ -9,6 +9,7 @@ use Exception;
  */
 class Boool {
 
+    protected static Boool $instance;
     protected array $methods;
 
     private string $directory = __DIR__;
@@ -17,41 +18,33 @@ class Boool {
     /**
      * Boool constructor.
      */
-    public function __construct()
+    private function __construct()
     {
-        $this->loadMethods();
+        // Blocks others from newing up this class.
     }
 
     /**
-     * @param $name
-     * @param $arguments
-     * @return mixed
-     * @throws Exception
+     * @return Boool
      */
-    public function __call($name, $arguments)
+    public static function getInstance()
     {
-        if (\array_key_exists($name, $this->methods)) {
-            return $this->methods[$name]->handle($arguments[0]);
+        if (empty(self::$instance)) {
+            self::$instance = new Boool();
+            self::$instance->methods = [];
+            self::$instance->loadMethods();
         }
 
-        throw new \RuntimeException($name . ' is not a known method.');
+        return self::$instance;
     }
 
     /**
-     * @param $name
-     * @param $arguments
-     * @return mixed
-     * @throws Exception
+     * @param string        $name
+     * @param CommonMethods $class
      */
-    public static function __callStatic($name, $arguments)
+    public static function register(string $name, CommonMethods $class) : void
     {
-        $boool = new Boool();
-
-        if (\array_key_exists($name, $boool->methods)) {
-            return $boool->methods[$name]->handle($arguments[0]);
-        }
-
-        throw new \RuntimeException($name . ' is not a known method.');
+        $instance = self::getInstance();
+        $instance->methods[$name] = get_class($class);
     }
 
     public function loadMethods()
@@ -62,12 +55,51 @@ class Boool {
 
         while (($file = readdir($methodFolder)) !== false) {
             if (filetype($this->methodDirectory . $file) === 'file') {
-                $name = \substr($file, 0, -4);
-                $classname = 'Boool\\Methods\\' . $name;
-                $this->methods[(string) $name] = new $classname();
+                $classname = 'Boool\\Methods\\' . substr($file, 0, -4);
+                $class = new $classname();
+
+                if (method_exists($class, 'registerSelf')) {
+                    $class->registerSelf();
+                }
             }
         }
         closedir($methodFolder);
+    }
+
+    /**
+     * @param string $methodName
+     *
+     * @return mixed
+     */
+    protected function getMethod(string $methodName)
+    {
+        $lookup = $this->caseInsensitiveLookup($methodName);
+        if ($lookup) {
+            return new $lookup;
+        }
+        echo 'nothing found';
+    }
+
+    /**
+     * @param string $methodName
+     *
+     * @return bool|string
+     */
+    protected function caseInsensitiveLookup(string $methodName)
+    {
+        foreach ($this->methods as $key => $class) {
+            if (strtolower($methodName) === strtolower($key)) {
+                return $class;
+            }
+        }
+        return false;
+    }
+
+    public function test(string $method, array $array) : bool
+    {
+        $worker = $this->getMethod($method);
+
+        return $worker->handle($array);
     }
 
 }

@@ -5,13 +5,30 @@ namespace Boool;
 class CommonMethods {
 
     /**
+     * @var array Other names that can be used to call the Methods.
+     */
+    protected array $alias = [];
+
+    /**
      * @return string
      */
     public function getName() : string
     {
-        $name = explode('\\', __CLASS__);
-
+        $name = explode('\\', get_class($this));
         return array_pop($name);
+    }
+
+    /**
+     * This method should be run by each of the Method Classes when creating the singleton,
+     * as it registers the Method Classes and makes them available.
+     */
+    public function registerSelf()
+    {
+        Boool::register($this->getName(), $this);
+
+        foreach ($this->alias as $alias) {
+            Boool::register($alias, $this);
+        }
     }
 
     /**
@@ -31,7 +48,10 @@ class CommonMethods {
             }
         }
 
-        return ['true' => $true, 'false' => $false];
+        return [
+            'true' => $true,
+            'false' => $false
+        ];
     }
 
     /**
@@ -49,6 +69,15 @@ class CommonMethods {
 
     /**
      * @param array $array
+     * @return int
+     */
+    public function countTrue(array $array) : int
+    {
+        return $this->getResults($array)['true'];
+    }
+
+    /**
+     * @param array $array
      * @return float
      */
     public function percentFalse(array $array) : float
@@ -58,6 +87,11 @@ class CommonMethods {
         $values = $this->getResults($array);
 
         return ($values['false']/$count) * 100;
+    }
+
+    public function countFalse(array $array) : int
+    {
+        return $this->getResults($array)['false'];
     }
 
 }
