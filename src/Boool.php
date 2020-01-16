@@ -2,58 +2,72 @@
 
 namespace Boool;
 
-use Boool\Contracts\Parser;
-use Boool\Traits\ManagesParsers;
+use Exception;
 
 /**
  * Class Boool
- *
- * This class acts as a wrapper around boolean values/statements and offers additional
- * information that can be used to determine the truthiness of multiple booleans.
  */
 class Boool {
 
-    use ManagesParsers;
+    protected array $methods;
 
-    private $throwException = false;
-    protected $statements = [];
+    private string $directory = __DIR__;
+    private string $methodDirectory;
 
+    /**
+     * Boool constructor.
+     */
     public function __construct()
     {
-        $this->loadParsers();
-    }
-
-    public function isTrue($arguments)
-    {
-        $arguments = $this->wrap($arguments);
-
-        $results = $this->validate($arguments);
+        $this->loadMethods();
     }
 
     /**
-     * Wraps the input into an array if it isn't one already.
-     *
+     * @param $name
      * @param $arguments
-     *
-     * @return array
+     * @return mixed
+     * @throws Exception
      */
-    protected function wrap($arguments) : array
+    public function __call($name, $arguments)
     {
-        if (!is_array($arguments)) {
-            $arguments = [$arguments];
+        if (\array_key_exists($name, $this->methods)) {
+            return $this->methods[$name]->handle($arguments[0]);
         }
 
-        return $arguments;
+        throw new \RuntimeException($name . ' is not a known method.');
     }
 
-    protected function validate(array $argument) {
-        $results = [];
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     * @throws Exception
+     */
+    public static function __callStatic($name, $arguments)
+    {
+        $boool = new Boool();
 
-        foreach ($argument as $key => $value) {
-            $results[] = (bool) $value;
+        if (\array_key_exists($name, $boool->methods)) {
+            return $boool->methods[$name]->handle($arguments[0]);
         }
 
-        return $results;
+        throw new \RuntimeException($name . ' is not a known method.');
+    }
+
+    public function loadMethods()
+    {
+        $this->methodDirectory = $this->directory . '/Methods/';
+
+        $methodFolder = opendir($this->methodDirectory);
+
+        while (($file = readdir($methodFolder)) !== false) {
+            if (filetype($this->methodDirectory . $file) === 'file') {
+                $name = \substr($file, 0, -4);
+                $classname = 'Boool\\Methods\\' . $name;
+                $this->methods[(string) $name] = new $classname();
+            }
+        }
+        closedir($methodFolder);
     }
 
 }

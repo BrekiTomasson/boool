@@ -2,8 +2,13 @@
 
 use Boool\Boool;
 
-include "vendor\autoload.php";
+include './vendor/autoload.php';
 
-$result = Boool::isTrue();
+$result = Boool::mostlyFalse([
+    1+1===1,
+    1+2===1,
+    1+1===2,
+    9-1===8
+]);
 
-echo $result;
+var_dump($result);
