@@ -1,24 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Boool\Methods;
 
 use Boool\CommonMethods;
 use Boool\MethodInterface;
 
-class AllFalse extends CommonMethods implements MethodInterface {
+class AllFalse extends CommonMethods implements MethodInterface
+{
+    protected array $alias = ['OnlyFalse', 'EverythingFalse', 'NoTrue'];
 
-    /**
-     * @param array $array
-     * @return bool
-     */
-    public function handle($array = []) : bool
+    public function handle(...$arguments): bool
     {
-        foreach ($array as $statement) {
-            if ($statement === true) {
-                return false;
-            }
-        }
-        return true;
+        return ! (in_array(true, $arguments[0], true));
     }
-
 }

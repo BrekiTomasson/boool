@@ -1,41 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Boool;
 
-class CommonMethods {
-
-    /**
-     * @var array Other names that can be used to call the Methods.
-     */
+class CommonMethods
+{
     protected array $alias = [];
 
-    /**
-     * @return string
-     */
-    public function getName() : string
+    public function countFalse(array $array): int
     {
-        $name = explode('\\', get_class($this));
+        return $this->getResults($array)['false'];
+    }
+
+    public function countTrue(array $array): int
+    {
+        return $this->getResults($array)['true'];
+    }
+
+    public function getName(): string
+    {
+        $name = explode('\\', static::class);
+
         return array_pop($name);
     }
 
-    /**
-     * This method should be run by each of the Method Classes when creating the singleton,
-     * as it registers the Method Classes and makes them available.
-     */
-    public function registerSelf()
-    {
-        Boool::register($this->getName(), $this);
-
-        foreach ($this->alias as $alias) {
-            Boool::register($alias, $this);
-        }
-    }
-
-    /**
-     * @param array $array
-     * @return array
-     */
-    public function getResults(array $array) : array
+    public function getResults(array $array): array
     {
         $false = 0;
         $true = 0;
@@ -48,50 +38,29 @@ class CommonMethods {
             }
         }
 
-        return [
-            'true' => $true,
-            'false' => $false
-        ];
+        return ['true' => $true, 'false' => $false];
     }
 
-    /**
-     * @param array $array
-     * @return float
-     */
-    public function percentTrue(array $array) : float
+    public function percentFalse(array $array): float
     {
-        $count = count($array);
-
         $values = $this->getResults($array);
 
-        return ($values['true']/$count) * 100;
+        return ($values['false'] / count($array)) * 100;
     }
 
-    /**
-     * @param array $array
-     * @return int
-     */
-    public function countTrue(array $array) : int
+    public function percentTrue(array $array): float
     {
-        return $this->getResults($array)['true'];
-    }
-
-    /**
-     * @param array $array
-     * @return float
-     */
-    public function percentFalse(array $array) : float
-    {
-        $count = count($array);
-
         $values = $this->getResults($array);
 
-        return ($values['false']/$count) * 100;
+        return ($values['true'] / count($array)) * 100;
     }
 
-    public function countFalse(array $array) : int
+    public function registerSelf(): void
     {
-        return $this->getResults($array)['false'];
-    }
+        Boool::register($this->getName(), $this);
 
+        foreach ($this->alias as $alias) {
+            Boool::register($alias, $this);
+        }
+    }
 }

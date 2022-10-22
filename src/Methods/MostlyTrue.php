@@ -1,19 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Boool\Methods;
 
 use Boool\CommonMethods;
 use Boool\MethodInterface;
 
-class MostlyTrue extends CommonMethods implements MethodInterface {
+class MostlyTrue extends CommonMethods implements MethodInterface
+{
+    protected array $alias = ['Most'];
 
-    /**
-     * @param array $array
-     * @return bool
-     */
-    public function handle(array $array = []) : bool
+    public function handle(...$arguments): bool
     {
-        return $this->percentTrue($array) > 50;
+        return $this->percentTrue($arguments[0]) > 50;
     }
-
 }

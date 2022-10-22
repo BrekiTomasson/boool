@@ -1,13 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Boool;
 
-interface MethodInterface {
-
-    /**
-     * @param array $array
-     * @return bool
-     */
-    public function handle(array $array = []) : bool;
-
+interface MethodInterface
+{
+    public function handle(...$arguments): bool;
 }

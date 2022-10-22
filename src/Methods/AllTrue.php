@@ -1,26 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Boool\Methods;
 
 use Boool\CommonMethods;
 use Boool\MethodInterface;
 
-class AllTrue extends CommonMethods implements MethodInterface {
+class AllTrue extends CommonMethods implements MethodInterface
+{
+    protected array $alias = ['All', 'OnlyTrue', 'EverythingTrue', 'NoFalse'];
 
-    protected array $alias = ['OnlyTrue', 'EverythingTrue'];
-
-    /**
-     * @param array $array
-     * @return bool
-     */
-    public function handle($array = []) : bool
+    public function handle(...$arguments): bool
     {
-        foreach ($array as $statement) {
-            if ($statement === false) {
-                return false;
-            }
+        if (in_array(false, $arguments[0], true)) {
+            return false;
         }
+
         return true;
     }
-
 }

@@ -1,19 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Boool\Methods;
 
 use Boool\CommonMethods;
 use Boool\MethodInterface;
 
-class AtLeastHalfTrue extends CommonMethods implements MethodInterface {
-
-    /**
-     * @param array $array
-     * @return bool
-     */
-    public function handle(array $array = []) : bool
+class AtLeastHalfTrue extends CommonMethods implements MethodInterface
+{
+    public function handle(...$arguments): bool
     {
-        return $this->percentTrue($array) >= 50;
+        return $this->percentTrue($arguments[0]) >= 50;
     }
-
 }

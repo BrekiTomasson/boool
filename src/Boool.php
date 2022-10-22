@@ -1,60 +1,58 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Boool;
 
-use Exception;
+use Boool\Exceptions\NotAnArray;
 
-/**
- * Class Boool
- */
-class Boool {
-
-    protected static Boool $instance;
-    protected array $methods;
+class Boool
+{
+    protected array $methods = [];
 
     private string $directory = __DIR__;
-    private string $methodDirectory;
 
-    /**
-     * Boool constructor.
-     */
+    protected static Boool $instance;
+
     private function __construct()
     {
-        // Blocks others from newing up this class.
+        // We don't want anybody else to be able to instantiate this class, as all methods are run statically
+        // through the magic method below.
     }
 
-    /**
-     * @return Boool
-     */
-    public static function getInstance()
+    public static function __callStatic(string $name, array $arguments): bool
+    {
+        if (! is_array($arguments[0])) {
+            throw new NotAnArray('Input must be an array.');
+        }
+
+        return self::getInstance()->getMethod($name)?->handle(...$arguments);
+    }
+
+    public static function getInstance(): Boool
     {
         if (empty(self::$instance)) {
             self::$instance = new Boool();
-            self::$instance->methods = [];
             self::$instance->loadMethods();
         }
 
         return self::$instance;
     }
 
-    /**
-     * @param string        $name
-     * @param CommonMethods $class
-     */
-    public static function register(string $name, CommonMethods $class) : void
+    public static function register(string $name, CommonMethods $class): void
     {
         $instance = self::getInstance();
         $instance->methods[$name] = get_class($class);
     }
 
-    public function loadMethods()
+    public function loadMethods(): void
     {
-        $this->methodDirectory = $this->directory . '/Methods/';
+        $methodDirectory = $this->directory . '/Methods/';
 
-        $methodFolder = opendir($this->methodDirectory);
+        $methodFolder = opendir($methodDirectory);
 
         while (($file = readdir($methodFolder)) !== false) {
-            if (filetype($this->methodDirectory . $file) === 'file') {
+            if (filetype($methodDirectory . $file) === 'file') {
                 $classname = 'Boool\\Methods\\' . substr($file, 0, -4);
                 $class = new $classname();
 
@@ -66,40 +64,26 @@ class Boool {
         closedir($methodFolder);
     }
 
-    /**
-     * @param string $methodName
-     *
-     * @return mixed
-     */
-    protected function getMethod(string $methodName)
-    {
-        $lookup = $this->caseInsensitiveLookup($methodName);
-        if ($lookup) {
-            return new $lookup;
-        }
-        echo 'nothing found';
-    }
-
-    /**
-     * @param string $methodName
-     *
-     * @return bool|string
-     */
-    protected function caseInsensitiveLookup(string $methodName)
+    protected function caseInsensitiveLookup(string $methodName): bool|string
     {
         foreach ($this->methods as $key => $class) {
             if (strtolower($methodName) === strtolower($key)) {
                 return $class;
             }
         }
+
         return false;
     }
 
-    public function test(string $method, array $array) : bool
+    /** @return mixed|void */
+    protected function getMethod(string $methodName)
     {
-        $worker = $this->getMethod($method);
+        $lookup = $this->caseInsensitiveLookup($methodName);
 
-        return $worker->handle($array);
+        if ($lookup) {
+            return new $lookup;
+        }
+
+        echo 'nothing found';
     }
-
 }
