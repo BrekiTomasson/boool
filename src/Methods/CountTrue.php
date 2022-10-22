@@ -4,20 +4,14 @@ declare(strict_types=1);
 
 namespace Boool\Methods;
 
-use Boool\CommonMethods;
-use Boool\Exceptions\NotAnInteger;
-use Boool\MethodInterface;
-
-class CountTrue extends CommonMethods implements MethodInterface
+class CountTrue extends \Boool\CommonMethod implements \Boool\MethodInterface
 {
     protected array $alias = ['AmountTrue'];
 
-    public function handle(...$arguments): bool
+    public function handle(array $arguments): bool
     {
-        if (!isset($arguments[1]) || ! is_int($arguments[1])) {
-            throw new NotAnInteger('This method requires an integer as its second argument.');
+        if ($this->testIntegerArgument($arguments)) {
+            return $this->countTrue($arguments[0]) === $arguments[1];
         }
-
-        return $this->countTrue($arguments[0]) === $arguments[1];
     }
 }

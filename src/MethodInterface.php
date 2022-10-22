@@ -6,5 +6,5 @@ namespace Boool;
 
 interface MethodInterface
 {
-    public function handle(...$arguments): bool;
+    public function handle(array $arguments): bool;
 }

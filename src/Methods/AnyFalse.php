@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Boool\Methods;
 
-use Boool\CommonMethods;
-use Boool\MethodInterface;
-
-class AnyFalse extends CommonMethods implements MethodInterface
+class AnyFalse extends \Boool\CommonMethod implements \Boool\MethodInterface
 {
     protected array $alias = ['ContainsFalse', 'HasFalse'];
 
-    public function handle(...$arguments): bool
+    public function handle(array $arguments): bool
     {
         return $this->countFalse($arguments[0]) >= 1;
     }

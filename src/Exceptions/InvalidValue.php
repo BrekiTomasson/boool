@@ -6,6 +6,6 @@ namespace Boool\Exceptions;
 
 use RuntimeException;
 
-class NotAnArray extends RuntimeException
+class InvalidValue extends RuntimeException
 {
 }
